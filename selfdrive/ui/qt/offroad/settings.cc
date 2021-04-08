@@ -62,6 +62,20 @@ QWidget * toggles_panel() {
                                            "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
                                            "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                            "../assets/offroad/icon_road.png"));
+  toggles_list->addWidget(horizontal_line());
+  toggles_list->addWidget(horizontal_line());
+  toggles_list->addWidget(new ParamControl("SmoothSpeedAdjustToggle",
+                                          "Smoother Deceleration",
+                                          "Smoother reaction to speed limits when decelerating",
+                                          "../assets/offroad/icon_speed_limit.png"));
+  toggles_list->addWidget(new ParamControl("IgnoreUnplausibleLimitToggle",
+                                          "Ignore unplausible speed limits",
+                                          "Ignore unplausible speed limits",
+                                          "../assets/offroad/icon_speed_limit.png"));
+  toggles_list->addWidget(new ParamControl("IgnoreLimitLeadToggle",
+                                          "Ignore speed limits when following",
+                                          "Ignore speed limits when following lead car",
+                                          "../assets/offroad/icon_speed_limit.png"));
 
 #ifdef QCOM2
   toggles_list->addWidget(horizontal_line());

@@ -1285,6 +1285,22 @@ BO_ 783 SWA_01: 8 Gateway_MQB
  SG_ SWA_Gischtzaehler : 48|7@1+ (1,0) [0|100] "Unit_PerCent"  Vector__XXX
  SG_ SWA_KD_Fehler : 59|1@1+ (1,0) [0|1] ""  Vector__XXX
 
+BO_ 385 VZE_01: 8 Gateway_D4C7
+ SG_ VZE_Anzeigemodus : 0|2@1+ (1.0,0.0) [0.0|3] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Hinweistext : 2|3@1+ (1,0) [1|7] ""  Kombi_D4
+ SG_ VZE_Statuszaehler_1 : 5|2@1+ (1.0,0.0) [0.0|3] ""  Kombi_D4
+ SG_ VZE_Statuszaehler_2 : 7|2@1+ (1.0,0.0) [0.0|3] ""  Kombi_D4
+ SG_ VZE_Statuszaehler_3 : 9|2@1+ (1.0,0.0) [0.0|3] ""  Kombi_D4
+ SG_ VZE_Verkehrszeichen_1 : 11|8@1+ (1,0) [1|255] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Verkehrszeichen_2 : 19|8@1+ (1,0) [1|255] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Verkehrszeichen_3 : 27|8@1+ (1,0) [1|255] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Warnung_Verkehrszeichen_1 : 35|1@1+ (1.0,0.0) [0.0|1] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Warnung_Verkehrszeichen_2 : 36|1@1+ (1.0,0.0) [0.0|1] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Warnung_Verkehrszeichen_3 : 37|1@1+ (1.0,0.0) [0.0|1] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Zusatzschild_1 : 38|4@1+ (1,0) [1|15] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Zusatzschild_2 : 42|4@1+ (1,0) [1|15] ""  HUD_C7,Kombi_D4
+ SG_ VZE_Zusatzschild_3 : 46|4@1+ (1,0) [1|15] ""  HUD_C7,Kombi_D4
+
 BO_ 804 ACC_04: 8 XXX
  SG_ CHECKSUM : 0|8@1+ (1,0) [0|255] ""  XXX
  SG_ COUNTER : 8|4@1+ (1,0) [0|15] ""  XXX

@@ -120,6 +120,8 @@ class CarState(CarStateBase):
     if ret.cruiseState.speed > 90:
       ret.cruiseState.speed = 0
 
+    self.radarDistance = pt_cp.vl["ACC_02"]['ACC_Abstandsindex']
+
     # Update control button states for turn signals and ACC controls.
     self.buttonStates["accelCruise"] = bool(pt_cp.vl["GRA_ACC_01"]['GRA_Tip_Hoch'])
     self.buttonStates["decelCruise"] = bool(pt_cp.vl["GRA_ACC_01"]['GRA_Tip_Runter'])
@@ -148,6 +150,10 @@ class CarState(CarStateBase):
     # Additional safety checks performed in CarInterface.
     self.parkingBrakeSet = bool(pt_cp.vl["Kombi_01"]['KBI_Handbremse'])  # FIXME: need to include an EPB check as well
     ret.espDisabled = pt_cp.vl["ESP_21"]['ESP_Tastung_passiv'] != 0
+
+    self.trafficSign_01 = cam_cp.vl["VZE_01"]['VZE_Verkehrszeichen_1']
+    self.trafficSign_02 = cam_cp.vl["VZE_01"]['VZE_Verkehrszeichen_2']
+    self.trafficSign_03 = cam_cp.vl["VZE_01"]['VZE_Verkehrszeichen_3']
 
     return ret
 
@@ -189,6 +195,7 @@ class CarState(CarStateBase):
       ("TSK_Status", "TSK_06", 0),                  # ACC engagement status from drivetrain coordinator
       ("TSK_Fahrzeugmasse_02", "Motor_16", 0),      # Estimated vehicle mass from drivetrain coordinator
       ("ACC_Wunschgeschw", "ACC_02", 0),            # ACC set speed
+      ("ACC_Abstandsindex", "ACC_02", 0),           # ACC radar distance
       ("AWV2_Freigabe", "ACC_10", 0),               # FCW brake jerk release
       ("ANB_Teilbremsung_Freigabe", "ACC_10", 0),   # AEB partial braking release
       ("ANB_Zielbremsung_Freigabe", "ACC_10", 0),   # AEB target braking release
@@ -252,6 +259,9 @@ class CarState(CarStateBase):
       ("LDW_Seite_DLCTLC", "LDW_02", 0),              # Direction of most likely lane departure (left or right)
       ("LDW_DLC", "LDW_02", 0),                       # Lane departure, distance to line crossing
       ("LDW_TLC", "LDW_02", 0),                       # Lane departure, time to line crossing
+      ("VZE_Verkehrszeichen_1", "VZE_01", 0),         # Recognized Traffic Sign 01
+      ("VZE_Verkehrszeichen_2", "VZE_01", 0),         # Recognized Traffic Sign 02
+      ("VZE_Verkehrszeichen_3", "VZE_01", 0),         # Recognized Traffic Sign 03
     ]
 
     checks = [
