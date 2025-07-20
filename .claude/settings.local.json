@@ -7,7 +7,16 @@
       "Bash(git push:*)",
       "Bash(git remote:*)",
       "Bash(git submodule sync:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(awk:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(cut:*)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git fetch:*)",
+      "WebFetch(domain:api.github.com)"
     ],
     "deny": []
   }
