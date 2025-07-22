@@ -235,5 +235,15 @@ def create_adrv_messages(packer, CAN, frame):
 
 def create_isla_silence(packer, CAN, CS):
   values = copy.copy(CS.msg_1fa)
-  values["ISLA_SpdWrn"] = 0  # Silence ISLA warning (2-bit field: 0=off, 1-3=various warning states)
+
+  # Copy navigation speed limit to cluster display
+  navi_speed = values.get("ISLW_SpdNaviMainDis", 0)
+  values["ISLW_SpdCluMainDis"] = navi_speed
+  # Also copy sub-condition speeds if present
+  navi_sub_speed = values.get("ISLW_SpdNaviSubMainDis", 0)
+  values["ISLW_SpdCluSubMainDis"] = navi_sub_speed
+
+  # Ensure ISLA warnings are disabled
+  values["ISLA_OptUsmSta"] = 1  # No warning
+
   return packer.make_can_msg("FR_CMR_02_100ms", CAN.ECAN, values)
