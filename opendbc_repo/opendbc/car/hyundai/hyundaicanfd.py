@@ -235,5 +235,5 @@ def create_adrv_messages(packer, CAN, frame):
 
 def create_isla_silence(packer, CAN, CS):
   values = copy.copy(CS.msg_1fa)
-  values["ISLA_SpdWrn"] = 0  # Silence ISLA warning
+  values["ISLA_SpdWrn"] = 0  # Silence ISLA warning (2-bit field: 0=off, 1-3=various warning states)
   return packer.make_can_msg("FR_CMR_02_100ms", CAN.ECAN, values)

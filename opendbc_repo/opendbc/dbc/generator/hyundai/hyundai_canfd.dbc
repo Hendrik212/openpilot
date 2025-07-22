@@ -1,9 +1,35 @@
 CM_ "IMPORT _hyundai_common.dbc";
 
-BO_ 506 FR_CMR_02_100ms: 32 XXX
-SG_ CHECKSUM : 0|16@1+ (1,0) [0|65535] "" XXX
-SG_ COUNTER : 16|8@1+ (1,0) [0|255] "" XXX
-SG_ ISLA_SpdWrn : 56|1@1+ (1,0) [0|1] "" XXX
+BO_ 506 FR_CMR_02_100ms: 32 FR_CMR
+SG_ CHECKSUM : 0|16@1+ (1,0) [0|65535] "" CGW
+SG_ COUNTER : 16|8@1+ (1,0) [0|255] "" CGW
+SG_ ISLW_OptUsmSta : 24|2@1+ (1,0) [0|3] "" CLU,CGW
+SG_ ISLW_SysSta : 26|2@1+ (1,0) [0|3] "" CLU,CGW
+SG_ ISLW_NoPassingInfoDis : 28|3@1+ (1,0) [0|7] "" CLU,CGW
+SG_ ISLW_OvrlpSignDis : 31|2@1+ (1,0) [0|3] "" CLU,CGW
+SG_ ISLW_SpdCluMainDis : 33|8@1+ (1,0) [0|255] "" CLU,CGW
+SG_ ISLW_SpdNaviMainDis : 41|8@1+ (1,0) [0|255] "" CGW
+SG_ ISLW_SubCondinfoSta1 : 49|4@1+ (1,0) [0|15] "" CLU,CGW
+SG_ ISLW_SubCondinfoSta2 : 53|4@1+ (1,0) [0|15] "" CLU,CGW
+SG_ ISLW_SpdCluSubMainDis : 64|8@1+ (1,0) [0|255] "" CLU
+SG_ ISLW_SpdCluDisSubCond1 : 72|8@1+ (1,0) [0|255] "" CLU,CGW
+SG_ ISLW_SpdCluDisSubCond2 : 80|8@1+ (1,0) [0|255] "" CLU,CGW
+SG_ ISLW_SpdNaviSubMainDis : 88|8@1+ (1,0) [0|255] "" CLU
+SG_ ISLW_SpdNaviDisSubCond1 : 96|8@1+ (1,0) [0|255] "" CLU,CGW
+SG_ ISLW_SpdNaviDisSubCond2 : 104|8@1+ (1,0) [0|255] "" CLU,CGW
+SG_ ISLA_SpdwOffst : 112|8@1+ (1,0) [0|255] "" CLU,CGW
+SG_ ISLA_SwIgnoreReq : 120|2@1+ (1,0) [0|3] "" CGW
+SG_ ISLA_SpdChgReq : 122|2@1+ (1,0) [0|3] "" CGW
+SG_ ISLA_SpdWrn : 124|2@1+ (1,0) [0|3] "" CLU,CGW
+SG_ ISLA_IcyWrn : 126|2@1+ (1,0) [0|3] "" CLU,CGW
+SG_ ISLA_SymFlashMod : 128|3@1+ (1,0) [0|7] "" CLU,CGW
+SG_ ISLA_Popup : 131|3@1+ (1,0) [0|7] "" CLU
+SG_ ISLA_OptUsmSta : 136|3@1+ (1,0) [0|7] "" CLU,CGW
+SG_ ISLA_OffstUsmSta : 139|3@1+ (1,0) [0|7] "" CLU,CGW
+SG_ ISLA_AutoUsmSta : 142|2@1+ (1,0) [0|3] "" CLU,CGW
+SG_ ISLA_Cntry : 144|4@1+ (1,0) [0|15] "" CLU,CGW
+SG_ ISLA_AddtnlSign : 149|5@1+ (1,0) [0|31] "" CLU,CGW
+SG_ ISLA_SchoolZone : 154|2@1+ (1,0) [0|3] "" CLU,CGW
 
 BO_ 53 ACCELERATOR: 32 XXX
  SG_ CHECKSUM : 0|16@1+ (1,0) [0|65535] "" XXX
