@@ -181,6 +181,10 @@ class CarController(CarControllerBase):
     if lka_steering and self.CP.flags & HyundaiFlags.ENABLE_BLINKERS:
       can_sends.extend(hyundaicanfd.create_spas_messages(self.packer, self.CAN, CC.leftBlinker, CC.rightBlinker))
 
+    # ISLA silencing
+    if self.frame % 10 == 0 and self.CP.flags & HyundaiFlags.ISLA_SILENCE:
+      can_sends.append(hyundaicanfd.create_isla_silence(self.packer, self.CAN, CS))
+
     if self.CP.openpilotLongitudinalControl:
       if lka_steering:
         can_sends.extend(hyundaicanfd.create_adrv_messages(self.packer, self.CAN, self.frame))

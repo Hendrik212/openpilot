@@ -1,5 +1,10 @@
 CM_ "IMPORT _hyundai_common.dbc";
 
+BO_ 506 FR_CMR_02_100ms: 32 XXX
+SG_ CHECKSUM : 0|16@1+ (1,0) [0|65535] "" XXX
+SG_ COUNTER : 16|8@1+ (1,0) [0|255] "" XXX
+SG_ ISLA_SpdWrn : 56|1@1+ (1,0) [0|1] "" XXX
+
 BO_ 53 ACCELERATOR: 32 XXX
  SG_ CHECKSUM : 0|16@1+ (1,0) [0|65535] "" XXX
  SG_ COUNTER : 16|8@1+ (1,0) [0|255] "" XXX

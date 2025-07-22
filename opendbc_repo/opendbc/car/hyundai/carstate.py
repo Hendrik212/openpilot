@@ -303,6 +303,9 @@ class CarState(CarStateBase):
 
     ret.blockPcmEnable = not self.recent_button_interaction()
 
+    if self.CP.flags & HyundaiFlags.ISLA_SILENCE:
+      self.msg_1fa = copy.copy(cp.vl["FR_CMR_02_100ms"])
+
     return ret
 
   def get_can_parsers_canfd(self, CP):
@@ -335,6 +338,11 @@ class CarState(CarStateBase):
     if CP.enableBsm:
       pt_messages += [
         ("BLINDSPOTS_REAR_CORNERS", 20),
+      ]
+
+    if CP.flags & HyundaiFlags.ISLA_SILENCE:
+      pt_messages += [
+        ("FR_CMR_02_100ms", 100),
       ]
 
     if not (CP.flags & HyundaiFlags.CANFD_CAMERA_SCC.value) and not CP.openpilotLongitudinalControl:
