@@ -181,7 +181,7 @@ class EngagementAlert(Alert):
     super().__init__("", "",
                      AlertStatus.normal, AlertSize.none,
                      Priority.MID, VisualAlert.none,
-                     audible_alert, .2),
+                     audible_alert, 0),
 
 
 class NormalPermanentAlert(Alert):
