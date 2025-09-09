@@ -103,8 +103,8 @@ cd opendbc_repo
 git push origin master
 cd ..
 
-# Push main repository changes
-git push origin isla-master
+# Push main repository changes (skip LFS to avoid GitLab permission issues)
+GIT_LFS_SKIP_PUSH=1 git push github isla-master
 ```
 
 ## Common Scenarios and Solutions
@@ -133,18 +133,40 @@ git add <resolved-files>
 git commit  # Complete the merge
 ```
 
-### Scenario 4: Authentication Issues
+### Scenario 4: LFS Permission Issues
+```bash
+# If push fails with "git@gitlab.com: Permission denied (publickey)"
+# This means Git LFS is trying to push to CommaAI's LFS server
+# Solution: Skip LFS push since objects already exist there
+GIT_LFS_SKIP_PUSH=1 git push github isla-master
+```
+
+### Scenario 5: Authentication Issues  
 ```bash
 # If push fails due to authentication:
-# 1. Generate new GitHub personal access token
-# 2. Update remote URL with token:
-git remote set-url origin https://USERNAME:TOKEN@github.com/Hendrik212/openpilot.git
+# 1. Remove embedded token and use browser auth:
+git remote set-url github https://github.com/Hendrik212/openpilot.git
 
-# Or push with explicit credentials:
-git push https://USERNAME:TOKEN@github.com/Hendrik212/openpilot.git isla-master
+# 2. Or generate new GitHub personal access token and update remote:
+git remote set-url github https://USERNAME:TOKEN@github.com/Hendrik212/openpilot.git
 ```
 
 ## Important Notes
+
+### Git LFS Handling
+
+The openpilot repository uses Git LFS for large files (models, binaries, etc.). CommaAI's LFS server (`gitlab.com/commaai/openpilot-lfs.git`) hosts these files, but we don't have write access to it.
+
+**Solution:** Use `GIT_LFS_SKIP_PUSH=1` when pushing to your GitHub fork:
+- Your code changes get pushed to GitHub
+- LFS objects remain on CommaAI's public LFS server
+- Anyone cloning your fork automatically gets models from CommaAI's LFS server
+- No duplication, no permission issues, fully functional fork
+
+**Why this works:**
+- The `.gitattributes` file still points LFS to CommaAI's server
+- Your fork has your code + references to upstream LFS objects
+- This creates a hybrid setup: your changes on GitHub, shared resources from CommaAI
 
 ### Preserving ISLA Modifications
 - The merge process preserves all custom ISLA modifications
