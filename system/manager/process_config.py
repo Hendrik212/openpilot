@@ -114,6 +114,10 @@ procs = [
   PythonProcess("webrtcd", "system.webrtc.webrtcd", notcar),
   PythonProcess("webjoystick", "tools.bodyteleop.web", notcar),
   PythonProcess("joystick", "tools.joystick.joystick_control", and_(joystick, iscar)),
+
+  # MQTT
+  PythonProcess("mqttd", "system.mqttd.mqttd", only_offroad),
+  PythonProcess("mqttd_status", "system.mqttd.status", only_offroad)
 ]
 
 managed_processes = {p.name: p for p in procs}

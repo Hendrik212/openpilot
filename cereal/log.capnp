@@ -2375,6 +2375,18 @@ struct UploaderState {
   lastFilename @6 :Text;
 }
 
+struct MqttPubQueue {
+  publish @0 :Bool;
+  subscribe @1 :Bool;
+  topic @2 :Text;
+  content @3 :Text;
+}
+
+struct MqttRecvQueue {
+  topic @0 :Text;
+  payload @1 :Text;
+}
+
 struct NavInstruction {
   maneuverPrimaryText @0 :Text;
   maneuverSecondaryText @1 :Text;
