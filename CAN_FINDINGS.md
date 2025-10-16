@@ -3,46 +3,42 @@
 ## Summary
 Analysis of CAN bus 0 and bus 1 messages to identify metrics for MQTT publishing.
 
-## Confirmed Metrics
+## ✅ VERIFIED Metrics (Charging Session: 24% → 31%, 129km → 164km)
 
-### 🎯 Message 0x3b5 (949) - Bus 1 - **ALL METRICS IN ONE MESSAGE!**
-
-This single message contains both critical metrics, making implementation extremely simple.
-
-#### 1. Range (Estimated Driving Range)
-- **Message ID**: 0x3b5 (949)
+### 1. Battery State of Charge (SOC)
+- **Message ID**: 0x2fa (762)
 - **Bus**: 1
-- **Byte**: 16
-- **Encoding**: Direct km value
+- **Byte**: 15
+- **Encoding**: **Divide by 2**
+- **Formula**: `byte_value / 2.0 = SOC%`
+- **Verification Data**:
+  - Charging session: 24% → 31% SOC
+  - Captured progression: 24.0% → 24.5% → 25.0% → 25.5% → 26.0% → 26.5% → 28.0% → 28.5% → 29.0% → 30.5%
+  - Raw byte values: 48 → 49 → 50 → 51 → 52 → 53 → 56 → 57 → 58 → 61
+- **Example**: 48 / 2 = 24.0%, 61 / 2 = 30.5%
+- **Status**: ✅ **VERIFIED** (Capture file: can_changes_soc_24_to_31.txt)
+
+### 2. Estimated Driving Range
+- **Message ID**: 0x28d (653)
+- **Bus**: 1
+- **Byte**: 24
+- **Encoding**: **Direct km value**
 - **Formula**: `byte_value = range_km`
-- **Evidence from can_changes.txt**:
-  - Byte 16 values: 181, 182, 183 (progressive)
-  - Matches user dashboard: ~175km → 183km
-- **Example**: 0xB7 (183) = 183 km
-- **Status**: ✓ CONFIRMED
-
-#### 2. Battery State of Charge (SOC)
-- **Message ID**: 0x3b5 (949)
-- **Bus**: 1
-- **Byte**: 22
-- **Encoding**: Divide by 3
-- **Formula**: `byte_value / 3 = SOC%`
-- **Evidence from can_changes.txt**:
-  - Byte 22 constant at 106 (0x6A) across all captures
-  - 106 / 3 = 35.3% matches dashboard SOC of 35%
-- **Example**: 0x6A (106) / 3 = 35.3%
-- **Status**: ✓ CONFIRMED
+- **Verification Data**:
+  - Charging session: 129km → 164km range
+  - Captured progression: 136 → 137 → 138 → 139 → 140 → 144 → 160 km
+  - Note: Message starts with 0 values, then jumps to ~136km after initialization
+- **Example**: 0x88 (136) = 136 km, 0xA0 (160) = 160 km
+- **Status**: ✅ **VERIFIED** (Capture file: can_changes_soc_24_to_31.txt)
 
 ---
 
-### Alternative SOC Source (Not Needed)
+## ❌ DISCARDED - Previous Incorrect Findings
 
-#### Message 0x100 (256) - Bus 0
-- **Byte**: 20
-- **Encoding**: Divide by 3
-- **Formula**: `byte_value / 3 = SOC%`
-- **Example**: 0x68 (104) / 3 = 34.7%
-- **Status**: ✓ CONFIRMED but redundant (use 0x3b5 instead)
+### Message 0x3b5 (949) - Bus 1
+- **Status**: ❌ **INCORRECT** - This message does NOT contain battery metrics
+- **Reason**: Not present in Hyundai CAN FD DBC file, values did not match dashboard during verification
+- **Note**: This was from earlier incorrect analysis before proper charging session capture
 
 #### Option B: Message 0x28d (653) - Bus 1
 - **Message ID**: 0x28d (653)

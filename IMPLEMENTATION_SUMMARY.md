@@ -1,33 +1,32 @@
 # MQTT Implementation Summary - Hyundai Ioniq 6
 
-## Implementation Complete ✓
+## ✅ Implementation Complete - VERIFIED METRICS
 
-Successfully cleaned up and implemented MQTT publishing for two verified metrics.
+Successfully implemented MQTT publishing for two **verified** metrics confirmed through real charging session capture (24% → 31%, 129km → 164km).
 
 ## Changes Made
 
 ### 1. mqtt.py (opendbc_repo/opendbc/car/hyundai/mqtt.py)
 
-**Removed:**
-- All VW hybrid placeholder code (charging_status, kilometerstand, aussen_temp, charging_time_remaining)
-- Complex range dictionary → simplified to single integer
-- Unused helper functions (parse_bmc_data, parse_cluster_data, parse_vmcu_data, parse_environmental_data)
-- Unused bit/byte manipulation helpers
-- wakeCanBus() function (not needed for passive listening)
-- Long TODO comments and implementation notes
+**Status**: ✅ **Updated with VERIFIED metrics**
 
-**Added:**
-- **Range parsing** for message 0x3b5, bus 1, byte 16 (direct km value)
-
-**Kept:**
-- SOC parsing for message 0x100, bus 0, byte 20 (divide by 3)
-- Simple, clean code with only verified metrics
+**Final Implementation:**
+- **SOC**: Message 0x2fa (762), Bus 1, Byte 15 - Divide by 2
+  - Verified progression: 24.0% → 24.5% → 25.0% → ... → 30.5%
+- **Range**: Message 0x28d (653), Bus 1, Byte 24 - Direct km value
+  - Verified progression: 136km → 137km → 138km → ... → 160km
 
 **Final Output Variables:**
 ```python
-soc_out = -1.0      # Battery SOC percentage
-range_out = -1      # Range in kilometers
+soc_out = -1.0      # Battery SOC percentage (divide by 2)
+range_out = -1      # Range in kilometers (direct value)
 ```
+
+**Removed from Earlier Versions:**
+- ❌ Message 0x3b5 (incorrect - not in DBC, didn't match dashboard)
+- ❌ Message 0x100 (not needed - was placeholder from earlier tests)
+- All VW hybrid placeholder code
+- Unused helper functions
 
 ### 2. status.py (system/mqttd/status.py)
 
@@ -61,16 +60,18 @@ range_prev = None
 
 **Only publishes when values change** (null otherwise to reduce MQTT traffic)
 
-## Verified Metrics
+## ✅ Verified Metrics (Charging Capture: 24% → 31%, 129km → 164km)
 
-### 🎯 Single Message Solution!
+| Metric | Message ID | Bus | Byte | Encoding | Verified Examples |
+|--------|-----------|-----|------|----------|-------------------|
+| **SOC** | 0x2fa (762) | 1 | 15 | **Divide by 2** | 48/2 = 24.0%, 61/2 = 30.5% |
+| **Range** | 0x28d (653) | 1 | 24 | **Direct km** | 136 km, 140 km, 160 km |
 
-**All metrics come from message 0x3b5 on Bus 1 - no need to monitor multiple buses!**
-
-| Metric | Message ID | Bus | Byte | Encoding | Example |
-|--------|-----------|-----|------|----------|---------|
-| **Range** | 0x3b5 (949) | 1 | 16 | Direct km | 0xB7 (183) = 183 km |
-| **SOC** | 0x3b5 (949) | 1 | 22 | Divide by 3 | 0x6A (106) / 3 = 35.3% |
+**Verification Method:**
+- Captured live CAN data during charging session
+- SOC increased from 24% to 31% (7% increase)
+- Range increased from 129km to 164km (35km increase)
+- Both metrics show progressive, consistent increases matching dashboard values
 
 ## Testing Instructions
 
