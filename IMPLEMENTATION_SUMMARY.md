@@ -63,10 +63,14 @@ range_prev = None
 
 ## Verified Metrics
 
+### 🎯 Single Message Solution!
+
+**All metrics come from message 0x3b5 on Bus 1 - no need to monitor multiple buses!**
+
 | Metric | Message ID | Bus | Byte | Encoding | Example |
 |--------|-----------|-----|------|----------|---------|
-| **SOC** | 0x100 (256) | 0 | 20 | Divide by 3 | 0x68 (104) / 3 = 34.7% |
 | **Range** | 0x3b5 (949) | 1 | 16 | Direct km | 0xB7 (183) = 183 km |
+| **SOC** | 0x3b5 (949) | 1 | 22 | Divide by 3 | 0x6A (106) / 3 = 35.3% |
 
 ## Testing Instructions
 

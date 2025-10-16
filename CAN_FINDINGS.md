@@ -5,19 +5,13 @@ Analysis of CAN bus 0 and bus 1 messages to identify metrics for MQTT publishing
 
 ## Confirmed Metrics
 
-### 1. Battery State of Charge (SOC)
-- **Bus**: 0 (not bus 1)
-- **Message ID**: 0x100 (256)
-- **Byte**: 20
-- **Encoding**: Divide by 3
-- **Formula**: `byte_value / 3 = SOC%`
-- **Example**: 0x66 (102) / 3 = 34%
-- **Status**: ✓ CONFIRMED (from earlier bus 0 capture)
+### 🎯 Message 0x3b5 (949) - Bus 1 - **ALL METRICS IN ONE MESSAGE!**
 
-### 2. Range (Estimated Driving Range)
+This single message contains both critical metrics, making implementation extremely simple.
 
-#### Option A: Message 0x3b5 (949) - Bus 1 ⭐ **RECOMMENDED**
+#### 1. Range (Estimated Driving Range)
 - **Message ID**: 0x3b5 (949)
+- **Bus**: 1
 - **Byte**: 16
 - **Encoding**: Direct km value
 - **Formula**: `byte_value = range_km`
@@ -25,7 +19,30 @@ Analysis of CAN bus 0 and bus 1 messages to identify metrics for MQTT publishing
   - Byte 16 values: 181, 182, 183 (progressive)
   - Matches user dashboard: ~175km → 183km
 - **Example**: 0xB7 (183) = 183 km
-- **Status**: ✓ STRONG CANDIDATE
+- **Status**: ✓ CONFIRMED
+
+#### 2. Battery State of Charge (SOC)
+- **Message ID**: 0x3b5 (949)
+- **Bus**: 1
+- **Byte**: 22
+- **Encoding**: Divide by 3
+- **Formula**: `byte_value / 3 = SOC%`
+- **Evidence from can_changes.txt**:
+  - Byte 22 constant at 106 (0x6A) across all captures
+  - 106 / 3 = 35.3% matches dashboard SOC of 35%
+- **Example**: 0x6A (106) / 3 = 35.3%
+- **Status**: ✓ CONFIRMED
+
+---
+
+### Alternative SOC Source (Not Needed)
+
+#### Message 0x100 (256) - Bus 0
+- **Byte**: 20
+- **Encoding**: Divide by 3
+- **Formula**: `byte_value / 3 = SOC%`
+- **Example**: 0x68 (104) / 3 = 34.7%
+- **Status**: ✓ CONFIRMED but redundant (use 0x3b5 instead)
 
 #### Option B: Message 0x28d (653) - Bus 1
 - **Message ID**: 0x28d (653)
