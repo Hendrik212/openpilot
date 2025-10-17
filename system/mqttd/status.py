@@ -14,6 +14,14 @@ from openpilot.system.hardware import HARDWARE
 
 #f = open("mqtt_status_log.txt", "w")
 
+def format_time(minutes):
+  """Convert minutes to HH:MM format. Returns None if minutes < 0."""
+  if minutes < 0:
+    return None
+  hours = minutes // 60
+  mins = minutes % 60
+  return f"{hours:02d}:{mins:02d}"
+
 def publish_ha_discovery(pm, count, config_prefix):
   client_id = mqttd.client_id()
   content = {"name": "car","state_topic": f"home/binary_sensor/car/{client_id}", "device_class": "motion", "unique_id": client_id, "count": count}
@@ -47,6 +55,11 @@ def status_thread():
   device_prev = None
   soc_prev = None
   range_prev = None
+  pack_voltage_prev = None
+  charging_current_prev = None
+  charging_power_prev = None
+  charging_time_remaining_prev = None
+  charging_status_prev = None
   sleeptimer = time.monotonic()
 
   while True:
@@ -93,11 +106,22 @@ def status_thread():
       topic = f"{status_prefix}/openpilot/car_status"
       content = {"battery_level": mqtt.soc_out if soc_prev != mqtt.soc_out else None,
                  "range": mqtt.range_out if range_prev != mqtt.range_out else None,
+                 "pack_voltage": mqtt.pack_voltage_out if pack_voltage_prev != mqtt.pack_voltage_out else None,
+                 "charging_current": mqtt.charging_current_out if charging_current_prev != mqtt.charging_current_out else None,
+                 "charging_power": mqtt.charging_power_out if charging_power_prev != mqtt.charging_power_out else None,
+                 "charging_time_remaining_minutes": mqtt.charging_time_remaining_out if charging_time_remaining_prev != mqtt.charging_time_remaining_out else None,
+                 "charging_time_remaining": format_time(mqtt.charging_time_remaining_out) if charging_time_remaining_prev != mqtt.charging_time_remaining_out else None,
+                 "charging_status": mqtt.charging_status_out if charging_status_prev != mqtt.charging_status_out else None,
                 }
       mqttd.publish(pm, topic, content)
 
       soc_prev = mqtt.soc_out
       range_prev = mqtt.range_out
+      pack_voltage_prev = mqtt.pack_voltage_out
+      charging_current_prev = mqtt.charging_current_out
+      charging_power_prev = mqtt.charging_power_out
+      charging_time_remaining_prev = mqtt.charging_time_remaining_out
+      charging_status_prev = mqtt.charging_status_out
 
 
 def main():
