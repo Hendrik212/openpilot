@@ -3,6 +3,7 @@ import pyray as rl
 from collections.abc import Callable
 from abc import ABC
 from openpilot.system.ui.lib.application import gui_app, FontWeight, MousePos
+from openpilot.system.ui.lib.multilang import tr
 from openpilot.system.ui.lib.text_measure import measure_text_cached
 from openpilot.system.ui.widgets import Widget
 from openpilot.system.ui.widgets.button import Button, ButtonStyle
@@ -95,6 +96,7 @@ class ButtonAction(ItemAction):
       button_style=ButtonStyle.LIST_ACTION,
       border_radius=BUTTON_BORDER_RADIUS,
       click_callback=pressed,
+      text_padding=0,
     )
     self.set_enabled(enabled)
 
@@ -110,7 +112,7 @@ class ButtonAction(ItemAction):
 
   @property
   def text(self):
-    return _resolve_value(self._text_source, "Error")
+    return _resolve_value(self._text_source, tr("Error"))
 
   @property
   def value(self):
@@ -148,7 +150,7 @@ class TextAction(ItemAction):
 
   @property
   def text(self):
-    return _resolve_value(self._text_source, "Error")
+    return _resolve_value(self._text_source, tr("Error"))
 
   def get_width_hint(self) -> float:
     text_width = measure_text_cached(self._font, self.text, ITEM_TEXT_FONT_SIZE).x
@@ -174,8 +176,8 @@ class DualButtonAction(ItemAction):
     super().__init__(width=0, enabled=enabled)  # Width 0 means use full width
     self.left_text, self.right_text = left_text, right_text
 
-    self.left_button = Button(left_text, click_callback=left_callback, button_style=ButtonStyle.LIST_ACTION)
-    self.right_button = Button(right_text, click_callback=right_callback, button_style=ButtonStyle.DANGER)
+    self.left_button = Button(left_text, click_callback=left_callback, button_style=ButtonStyle.NORMAL, text_padding=0)
+    self.right_button = Button(right_text, click_callback=right_callback, button_style=ButtonStyle.DANGER, text_padding=0)
 
   def set_touch_valid_callback(self, touch_callback: Callable[[], bool]) -> None:
     super().set_touch_valid_callback(touch_callback)
