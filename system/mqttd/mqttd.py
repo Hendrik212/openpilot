@@ -129,7 +129,7 @@ def update_subs(client, connect_flag):
 
 # Set up the MQTT connection
 def setup_connection(client, pm):
-    broker = '192.168.1.202'
+    broker = 'mqtt.hendrikgroove.de'
     print("MQTT is going to attempt to connect now")
     #f.write(f"{datetime.datetime.now()} MQTT is going to attempt to connect now\n")
     #f.flush()
