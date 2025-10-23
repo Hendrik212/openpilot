@@ -134,7 +134,7 @@ def setup_connection(client, pm):
     #f.write(f"{datetime.datetime.now()} MQTT is going to attempt to connect now\n")
     #f.flush()
     try:
-        client = connect_mqtt(client=client, broker=broker, pm=pm, port=1883, username='fhem', password='fhem')
+        client = connect_mqtt(client=client, broker=broker, pm=pm, port=1884, username='fhem', password='fhem')
         client.loop_start()
     except:
         print("MQTT connection failed")
