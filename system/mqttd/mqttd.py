@@ -127,36 +127,25 @@ def update_subs(client, connect_flag):
                 #f.flush()
     return sub_dict
 
-# Set up the MQTT connection with multiple fallback rounds
-def setup_connection(client, pm, max_rounds=2):
-    servers = [
-        {'broker': 'mqtt.hendrikgroove.de', 'port': 1884},
-        {'broker': '192.168.1.202', 'port': 1883}
-    ]
-
+# Set up the MQTT connection
+def setup_connection(client, pm):
+    broker = '192.168.1.202'
+    port = 1883
     print("MQTT is going to attempt to connect now")
-
-    for round_num in range(max_rounds):
-        print(f"Connection attempt round {round_num + 1}")
-        for server_config in servers:
-            try:
-                print(f"Attempting to connect to {server_config['broker']}:{server_config['port']}")
-                client = connect_mqtt(
-                    client=client,
-                    broker=server_config['broker'],
-                    pm=pm,
-                    port=server_config['port'],
-                    username='fhem',
-                    password='fhem'
-                )
-                client.loop_start()
-                print(f"Successfully connected to {server_config['broker']}:{server_config['port']}")
-                return True
-            except Exception as e:
-                print(f"MQTT connection to {server_config['broker']}:{server_config['port']} failed: {e}")
-                continue
-
-    print(f"All MQTT connection attempts failed after {max_rounds} rounds")
+    #f.write(f"{datetime.datetime.now()} MQTT is going to attempt to connect now\n")
+    #f.flush()
+    try:
+        client = connect_mqtt(client=client, broker=broker, pm=pm, port=port, username='fhem', password='fhem')
+        client.loop_start()
+    except:
+        print("MQTT connection failed")
+        broker = 'mqtt.hendrikgroove.de'
+        port = 1884
+        client = connect_mqtt(client=client, broker=broker, pm=pm, port=port, username='fhem', password='fhem')
+        client.loop_start()
+        #f.write(f"{datetime.datetime.now()} MQTT connection failed\n")
+        #f.flush()
+        return True
     return False
 
 # Send MQTT publications
