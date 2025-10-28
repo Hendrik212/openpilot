@@ -129,20 +129,15 @@ def update_subs(client, connect_flag):
 
 # Set up the MQTT connection
 def setup_connection(client, pm):
-    broker = '192.168.1.202'
-    port = 1883
+    broker = 'mqtt.hendrikgroove.de'
     print("MQTT is going to attempt to connect now")
     #f.write(f"{datetime.datetime.now()} MQTT is going to attempt to connect now\n")
     #f.flush()
     try:
-        client = connect_mqtt(client=client, broker=broker, pm=pm, port=port, username='fhem', password='fhem')
+        client = connect_mqtt(client=client, broker=broker, pm=pm, port=1884, username='fhem', password='fhem')
         client.loop_start()
     except:
         print("MQTT connection failed")
-        broker = 'mqtt.hendrikgroove.de'
-        port = 1884
-        client = connect_mqtt(client=client, broker=broker, pm=pm, port=port, username='fhem', password='fhem')
-        client.loop_start()
         #f.write(f"{datetime.datetime.now()} MQTT connection failed\n")
         #f.flush()
         return True
