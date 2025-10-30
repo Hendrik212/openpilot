@@ -4,7 +4,7 @@ import datetime
 
 import cereal.messaging as messaging
 from openpilot.common.realtime import DT_CTRL
-from openpilot.common.dict_helpers import strip_deprecated_keys
+from openpilot.common.utils import strip_deprecated_keys
 from collections import defaultdict
 
 from openpilot.system.mqttd import mqttd
