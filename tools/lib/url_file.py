@@ -6,8 +6,10 @@ from hashlib import sha256
 from urllib3 import PoolManager, Retry
 from urllib3.response import BaseHTTPResponse
 from urllib3.util import Timeout
+from urllib3.exceptions import MaxRetryError
 
-from openpilot.common.utils import atomic_write_in_dir
+
+from openpilot.common.utils import atomic_write
 from openpilot.system.hardware.hw import Paths
 
 #  Cache chunk size
@@ -61,7 +63,10 @@ class URLFile:
     pass
 
   def _request(self, method: str, url: str, headers: dict[str, str] | None = None) -> BaseHTTPResponse:
-    return URLFile.pool_manager().request(method, url, timeout=self._timeout, headers=headers)
+    try:
+      return URLFile.pool_manager().request(method, url, timeout=self._timeout, headers=headers)
+    except MaxRetryError as e:
+      raise URLFileException(f"Failed to {method} {url}: {e}") from e
 
   def get_length_online(self) -> int:
     response = self._request('HEAD', self._url)
@@ -83,7 +88,7 @@ class URLFile:
 
     self._length = self.get_length_online()
     if not self._force_download and self._length != -1:
-      with atomic_write_in_dir(file_length_path, mode="w", overwrite=True) as file_length:
+      with atomic_write(file_length_path, mode="w", overwrite=True) as file_length:
         file_length.write(str(self._length))
     return self._length
 
@@ -106,7 +111,7 @@ class URLFile:
       #  If we don't have a file, download it
       if not os.path.exists(full_path):
         data = self.read_aux(ll=CHUNK_SIZE)
-        with atomic_write_in_dir(full_path, mode="wb", overwrite=True) as new_cached_file:
+        with atomic_write(full_path, mode="wb", overwrite=True) as new_cached_file:
           new_cached_file.write(data)
       else:
         with open(full_path, "rb") as cached_file:
