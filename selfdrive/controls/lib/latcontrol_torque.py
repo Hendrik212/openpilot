@@ -78,7 +78,7 @@ class LatControlTorque(LatControl):
       measurement_rate = self.measurement_rate_filter.update((measurement - self.previous_measurement) / self.dt)
       self.previous_measurement = measurement
 
-      setpoint = lat_delay * desired_lateral_jerk + expected_lateral_accel
+      setpoint = 0.6 * lat_delay * desired_lateral_jerk + expected_lateral_accel
       error = setpoint - measurement
 
       # do error correction in lateral acceleration space, convert at end to handle non-linear torque responses correctly
