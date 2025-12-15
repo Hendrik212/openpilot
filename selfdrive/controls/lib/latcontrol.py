@@ -10,6 +10,7 @@ class LatControl(ABC):
     self.sat_check_min_speed = 10.
 
     # we define the steer torque scale as [-1.0...1.0]
+    # this can be dynamically updated for speed-dependent limits
     self.steer_max = 1.0
 
   @abstractmethod

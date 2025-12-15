@@ -43,6 +43,7 @@ class LatControlTorque(LatControl):
     self.lat_accel_request_buffer = deque([0.] * self.lat_accel_request_buffer_len , maxlen=self.lat_accel_request_buffer_len)
     self.previous_measurement = 0.0
     self.measurement_rate_filter = FirstOrderFilter(0.0, 1 / (2 * np.pi * LP_FILTER_CUTOFF_HZ), self.dt)
+    self.last_steer_max = self.steer_max  # Track changes for dynamic limits
 
   def update_live_torque_params(self, latAccelFactor, latAccelOffset, friction):
     self.torque_params.latAccelFactor = latAccelFactor
@@ -55,6 +56,11 @@ class LatControlTorque(LatControl):
                         self.lateral_accel_from_torque(-self.steer_max, self.torque_params))
 
   def update(self, active, CS, VM, params, steer_limited_by_safety, desired_curvature, curvature_limited, lat_delay):
+    # Update PID limits if steer_max changed (for speed-dependent limits)
+    if abs(self.steer_max - self.last_steer_max) > 0.001:
+      self.update_limits()
+      self.last_steer_max = self.steer_max
+
     pid_log = log.ControlsState.LateralTorqueState.new_message()
     pid_log.version = VERSION
     if not active:
@@ -90,6 +96,11 @@ class LatControlTorque(LatControl):
       ff += get_friction(error, lateral_accel_deadzone, FRICTION_THRESHOLD, self.torque_params)
 
       freeze_integrator = steer_limited_by_safety or CS.steeringPressed or CS.vEgo < 5
+      # Reset integrator if available authority shrinks significantly to avoid residual windup
+      # Compare current normalized steer_max to previous
+      if self.last_steer_max > 1e-6 and (self.steer_max < self.last_steer_max * 0.9):
+        self.pid.reset()
+
       output_lataccel = self.pid.update(pid_log.error,
                                        -measurement_rate,
                                         feedforward=ff,

@@ -120,6 +120,14 @@ class Controls:
     self.desired_curvature, curvature_limited = clip_curvature(CS.vEgo, self.desired_curvature, new_desired_curvature, lp.roll)
     lat_delay = self.sm["liveDelay"].lateralDelay + LAT_SMOOTH_SECONDS
 
+    # Update lateral controller's steer_max for speed-dependent limits (Ioniq 6)
+    # This ensures PID limits match panda safety limits, preventing integral windup
+    if self.CP.lateralTuning.which() == 'torque' and hasattr(self.CI.CC, 'params') and hasattr(self.CI.CC.params, 'get_steer_max'):
+      steer_max_units = self.CI.CC.params.get_steer_max(CS.vEgo)
+      # Normalize to [-1.0, 1.0] range (assuming STEER_MAX_LOW_SPEED is the max possible)
+      normalized_steer_max = steer_max_units / self.CI.CC.params.STEER_MAX_LOW_SPEED
+      self.LaC.steer_max = normalized_steer_max
+
     actuators.curvature = self.desired_curvature
     steer, steeringAngleDeg, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                        self.steer_limited_by_safety, self.desired_curvature,
