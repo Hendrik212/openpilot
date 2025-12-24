@@ -23,11 +23,11 @@ def format_time(minutes):
   return f"{hours:02d}:{mins:02d}"
 
 def get_device_info():
-  """Build device info object for HA discovery."""
+  """Build device info for HA discovery."""
   client_id = mqttd.client_id()
   return {
     "identifiers": [client_id],
-    "name": "OpenPilot Car",
+    "name": "Ioniq 6",
     "manufacturer": "comma.ai",
     "model": HARDWARE.get_device_type(),
     "sw_version": "openpilot"
@@ -36,7 +36,9 @@ def get_device_info():
 def publish_sensor_discovery(pm, sensor_name, device_info, config_prefix):
   """Publish discovery config for a single sensor."""
   client_id = mqttd.client_id()
-  unique_id = f"{client_id}_{sensor_name}"
+  # Fix: Use underscores instead of slashes in topic (HA requirement)
+  unique_id = f"openpilot_{client_id}_{sensor_name}"
+  object_id = f"openpilot_{client_id}_{sensor_name}"
 
   sensors = {
     "battery_level": {
@@ -98,7 +100,8 @@ def publish_sensor_discovery(pm, sensor_name, device_info, config_prefix):
   config["payload_available"] = "online"
   config["payload_not_available"] = "offline"
 
-  topic = f"homeassistant/sensor/openpilot/{client_id}/{sensor_name}/config"
+  # Fix: Use underscores instead of slashes (HA discovery format requirement)
+  topic = f"homeassistant/sensor/{object_id}/config"
   mqttd.publish(pm, topic, config, qos=1, retain=True)
 
 def publish_ha_discovery(pm, count, config_prefix):
