@@ -2386,6 +2386,8 @@ struct MqttPubQueue {
   subscribe @1 :Bool;
   topic @2 :Text;
   content @3 :Text;
+  qos @4 :UInt8;
+  retain @5 :Bool;
 }
 
 struct MqttRecvQueue {
