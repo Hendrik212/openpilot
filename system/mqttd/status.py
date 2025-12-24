@@ -22,11 +22,97 @@ def format_time(minutes):
   mins = minutes % 60
   return f"{hours:02d}:{mins:02d}"
 
-def publish_ha_discovery(pm, count, config_prefix):
+def get_device_info():
+  """Build device info object for HA discovery."""
   client_id = mqttd.client_id()
-  content = {"name": "car","state_topic": f"home/binary_sensor/car/{client_id}", "device_class": "motion", "unique_id": client_id, "count": count}
-  topic = f"{config_prefix}/binary_sensor/car/{client_id}/config"
-  mqttd.publish(pm, topic, content)
+  return {
+    "identifiers": [client_id],
+    "name": "OpenPilot Car",
+    "manufacturer": "comma.ai",
+    "model": HARDWARE.get_device_type(),
+    "sw_version": "openpilot"
+  }
+
+def publish_sensor_discovery(pm, sensor_name, device_info, config_prefix):
+  """Publish discovery config for a single sensor."""
+  client_id = mqttd.client_id()
+  unique_id = f"{client_id}_{sensor_name}"
+
+  sensors = {
+    "battery_level": {
+      "name": "Battery Level",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.battery_level }}",
+      "unit_of_measurement": "%",
+      "device_class": "battery",
+    },
+    "range": {
+      "name": "Range",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.range }}",
+      "unit_of_measurement": "km",
+      "device_class": "distance",
+    },
+    "pack_voltage": {
+      "name": "Pack Voltage",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.pack_voltage }}",
+      "unit_of_measurement": "V",
+      "device_class": "voltage",
+    },
+    "charging_current": {
+      "name": "Charging Current",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.charging_current }}",
+      "unit_of_measurement": "A",
+      "device_class": "current",
+    },
+    "charging_power": {
+      "name": "Charging Power",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.charging_power }}",
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+    },
+    "charging_time_remaining": {
+      "name": "Charging Time Remaining",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.charging_time_remaining }}",
+      "icon": "mdi:clock",
+    },
+    "charging_status": {
+      "name": "Charging Status",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.charging_status }}",
+      "icon": "mdi:ev-station",
+    },
+  }
+
+  if sensor_name not in sensors:
+    return
+
+  config = sensors[sensor_name].copy()
+  config["unique_id"] = unique_id
+  config["device"] = device_info
+
+  topic = f"homeassistant/sensor/openpilot/{client_id}/{sensor_name}/config"
+  mqttd.publish(pm, topic, config)
+
+def publish_ha_discovery(pm, count, config_prefix):
+  """Publish discovery configs for all sensors."""
+  device_info = get_device_info()
+  sensors = [
+    "battery_level",
+    "range",
+    "pack_voltage",
+    "charging_current",
+    "charging_power",
+    "charging_time_remaining",
+    "charging_status",
+  ]
+
+  for sensor in sensors:
+    publish_sensor_discovery(pm, sensor, device_info, config_prefix)
 
 def status_thread():
   config_prefix = 'openpilot'
