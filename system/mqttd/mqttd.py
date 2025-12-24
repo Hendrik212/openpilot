@@ -17,13 +17,15 @@ def client_id():
     return f"{device_type}-{serial}"
 
 # Publish a message to a specified MQTT topic
-def publish(pm, topic, message):
+def publish(pm, topic, message, qos=0, retain=False):
     #f.write(f"{datetime.datetime.now()} preparing to publish message with topic " + topic + "\n")
     #f.flush()
     dat = messaging.new_message("mqttPubQueue")
     dat.mqttPubQueue.publish = True
     dat.mqttPubQueue.topic = topic
     dat.mqttPubQueue.content = json.dumps(message)
+    dat.mqttPubQueue.qos = qos
+    dat.mqttPubQueue.retain = retain
     pm.send("mqttPubQueue", dat)
 
 # Subscribe to an MQTT topic
@@ -53,6 +55,10 @@ def on_connect(client, userdata, flags, rc):
         #f.flush()
         client.connected_flag = True
         client.sub_dict = update_subs(client, True)
+
+        # Publish birth message for availability
+        availability_topic = f"openpilot/{client_id()}/availability"
+        client.publish(availability_topic, payload="online", qos=1, retain=True)
 
 # Callback function when a message is received
 def on_message(client, userdata, msg):
@@ -89,6 +95,10 @@ def connect_mqtt(client, broker, port, username, password, pm):
     client.on_message = on_message
     client.on_publish = on_publish
     client.on_disconnect = on_disconnect
+
+    # Set Last Will and Testament for availability
+    availability_topic = f"openpilot/{client_id()}/availability"
+    client.will_set(availability_topic, payload="offline", qos=1, retain=True)
 
     if port == 8883:
         client.tls_set()
@@ -155,7 +165,7 @@ def send_pubs(client):
         #f.write(f"{datetime.datetime.now()} now publishing " + message["topic"] + "\n")
         #f.write(f"{datetime.datetime.now()} " + str(message["content"]) + "\n")
         #f.flush()
-        result, mid = client.publish(message["topic"], message["content"])
+        result, mid = client.publish(message["topic"], message["content"], qos=message.get("qos", 0), retain=message.get("retain", False))
         #f.write(f"{datetime.datetime.now()} result: "  + str(result) + "\n")
         #f.flush()
         message["mid"] = mid
@@ -199,7 +209,7 @@ def mqtt_thread():
                 client.sub_dict[message.topic] = {"server_state": False}
             client.sub_dict[message.topic]["subscribe"] = True
         if message.publish:
-            msg = {"topic": message.topic, "content": message.content, "attempts": 0, "last_sent": time.time(), "mid": -1}
+            msg = {"topic": message.topic, "content": message.content, "qos": message.qos, "retain": message.retain, "attempts": 0, "last_sent": time.time(), "mid": -1}
             client.pub_list.append(msg)
             client.pub_list = client.pub_list[-100:]
         if client.connected_flag:

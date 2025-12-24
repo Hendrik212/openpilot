@@ -94,9 +94,12 @@ def publish_sensor_discovery(pm, sensor_name, device_info, config_prefix):
   config = sensors[sensor_name].copy()
   config["unique_id"] = unique_id
   config["device"] = device_info
+  config["availability_topic"] = f"openpilot/{client_id}/availability"
+  config["payload_available"] = "online"
+  config["payload_not_available"] = "offline"
 
   topic = f"homeassistant/sensor/openpilot/{client_id}/{sensor_name}/config"
-  mqttd.publish(pm, topic, config)
+  mqttd.publish(pm, topic, config, qos=1, retain=True)
 
 def publish_ha_discovery(pm, count, config_prefix):
   """Publish discovery configs for all sensors."""
@@ -189,15 +192,15 @@ def status_thread():
       mqttd.publish(pm, topic, content)
 
 
-      topic = f"{status_prefix}/openpilot/car_status"
-      content = {"battery_level": mqtt.soc_out if soc_prev != mqtt.soc_out else None,
-                 "range": mqtt.range_out if range_prev != mqtt.range_out else None,
-                 "pack_voltage": mqtt.pack_voltage_out if pack_voltage_prev != mqtt.pack_voltage_out else None,
-                 "charging_current": mqtt.charging_current_out if charging_current_prev != mqtt.charging_current_out else None,
-                 "charging_power": mqtt.charging_power_out if charging_power_prev != mqtt.charging_power_out else None,
-                 "charging_time_remaining_minutes": mqtt.charging_time_remaining_out if charging_time_remaining_prev != mqtt.charging_time_remaining_out else None,
-                 "charging_time_remaining": format_time(mqtt.charging_time_remaining_out) if charging_time_remaining_prev != mqtt.charging_time_remaining_out else None,
-                 "charging_status": mqtt.charging_status_out if charging_status_prev != mqtt.charging_status_out else None,
+      topic = f"openpilot/car_status"
+      content = {"battery_level": mqtt.soc_out,
+                 "range": mqtt.range_out,
+                 "pack_voltage": mqtt.pack_voltage_out,
+                 "charging_current": mqtt.charging_current_out,
+                 "charging_power": mqtt.charging_power_out,
+                 "charging_time_remaining_minutes": mqtt.charging_time_remaining_out,
+                 "charging_time_remaining": format_time(mqtt.charging_time_remaining_out),
+                 "charging_status": mqtt.charging_status_out,
                 }
       mqttd.publish(pm, topic, content)
 
