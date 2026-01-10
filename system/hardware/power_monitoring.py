@@ -117,7 +117,7 @@ class PowerMonitoring:
     #should_shutdown |= offroad_time > MAX_TIME_OFFROAD_S
     #should_shutdown |= low_voltage_shutdown
     #should_shutdown |= (self.car_battery_capacity_uWh <= 0)
-    should_shutdown |= (self.car_voltage_mV / 1e3 <= 11.6)
+    should_shutdown |= (self.car_voltage_mV / 1e3 <= 11)
     should_shutdown &= not ignition
     should_shutdown &= (not self.params.get_bool("DisablePowerDown"))
     should_shutdown &= in_car
