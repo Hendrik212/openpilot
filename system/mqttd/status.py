@@ -160,7 +160,7 @@ def status_thread():
     # get can messages
     can_recv = messaging.drain_sock(logcan)
     bus = 1
-    mqtt.getParsedMessages(can_recv, bus, dat)
+    mqtt.getParsedMessages(can_recv, bus, dat, pm)
 
     if cur_time > sleeptimer + 30: # update mqtt all 30s
       #f.write(str(datetime.datetime.now()) + " entering loop...\n")
