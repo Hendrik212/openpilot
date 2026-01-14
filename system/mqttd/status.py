@@ -114,9 +114,7 @@ def publish_binary_sensor_discovery(pm, sensor_name, device_info, config_prefix)
     "connector_connected": {
       "name": "Connector Connected",
       "state_topic": "openpilot/car_status",
-      "value_template": "{{ value_json.connector_connected }}",
-      "payload_on": True,
-      "payload_off": False,
+      "value_template": "{{ 'ON' if value_json.connector_connected else 'OFF' }}",
       "device_class": "plug",
     },
   }
