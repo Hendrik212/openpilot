@@ -104,6 +104,36 @@ def publish_sensor_discovery(pm, sensor_name, device_info, config_prefix):
   topic = f"homeassistant/sensor/{object_id}/config"
   mqttd.publish(pm, topic, config, qos=1, retain=True)
 
+def publish_binary_sensor_discovery(pm, sensor_name, device_info, config_prefix):
+  """Publish discovery config for a single binary sensor."""
+  client_id = mqttd.client_id()
+  unique_id = f"openpilot_{client_id}_{sensor_name}"
+  object_id = f"openpilot_{client_id}_{sensor_name}"
+
+  binary_sensors = {
+    "connector_connected": {
+      "name": "Connector Connected",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.connector_connected }}",
+      "payload_on": True,
+      "payload_off": False,
+      "device_class": "plug",
+    },
+  }
+
+  if sensor_name not in binary_sensors:
+    return
+
+  config = binary_sensors[sensor_name].copy()
+  config["unique_id"] = unique_id
+  config["device"] = device_info
+  config["availability_topic"] = f"openpilot/{client_id}/availability"
+  config["payload_available"] = "online"
+  config["payload_not_available"] = "offline"
+
+  topic = f"homeassistant/binary_sensor/{object_id}/config"
+  mqttd.publish(pm, topic, config, qos=1, retain=True)
+
 def publish_ha_discovery(pm, count, config_prefix):
   """Publish discovery configs for all sensors."""
   device_info = get_device_info()
@@ -117,8 +147,15 @@ def publish_ha_discovery(pm, count, config_prefix):
     "charging_status",
   ]
 
+  binary_sensors = [
+    "connector_connected",
+  ]
+
   for sensor in sensors:
     publish_sensor_discovery(pm, sensor, device_info, config_prefix)
+
+  for sensor in binary_sensors:
+    publish_binary_sensor_discovery(pm, sensor, device_info, config_prefix)
 
 def status_thread():
   config_prefix = 'openpilot'
@@ -204,6 +241,7 @@ def status_thread():
                  "charging_time_remaining_minutes": mqtt.charging_time_remaining_out,
                  "charging_time_remaining": format_time(mqtt.charging_time_remaining_out),
                  "charging_status": mqtt.charging_status_out,
+                 "connector_connected": mqtt.connector_connected_out,
                 }
       mqttd.publish(pm, topic, content)
 
