@@ -132,6 +132,34 @@ def publish_binary_sensor_discovery(pm, sensor_name, device_info, config_prefix)
   topic = f"homeassistant/binary_sensor/{object_id}/config"
   mqttd.publish(pm, topic, config, qos=1, retain=True)
 
+def publish_button_discovery(pm, button_name, device_info, config_prefix):
+  """Publish discovery config for a single button."""
+  client_id = mqttd.client_id()
+  unique_id = f"openpilot_{client_id}_{button_name}"
+  object_id = f"openpilot_{client_id}_{button_name}"
+
+  buttons = {
+    "wake_can_bus": {
+      "name": "Wake CAN Bus",
+      "command_topic": "openpilot/command/wake",
+      "payload_press": "PRESS",
+      "icon": "mdi:car-electric",
+    },
+  }
+
+  if button_name not in buttons:
+    return
+
+  config = buttons[button_name].copy()
+  config["unique_id"] = unique_id
+  config["device"] = device_info
+  config["availability_topic"] = f"openpilot/{client_id}/availability"
+  config["payload_available"] = "online"
+  config["payload_not_available"] = "offline"
+
+  topic = f"homeassistant/button/{object_id}/config"
+  mqttd.publish(pm, topic, config, qos=1, retain=True)
+
 def publish_ha_discovery(pm, count, config_prefix):
   """Publish discovery configs for all sensors."""
   device_info = get_device_info()
@@ -149,11 +177,18 @@ def publish_ha_discovery(pm, count, config_prefix):
     "connector_connected",
   ]
 
+  buttons = [
+    "wake_can_bus",
+  ]
+
   for sensor in sensors:
     publish_sensor_discovery(pm, sensor, device_info, config_prefix)
 
   for sensor in binary_sensors:
     publish_binary_sensor_discovery(pm, sensor, device_info, config_prefix)
+
+  for button in buttons:
+    publish_button_discovery(pm, button, device_info, config_prefix)
 
 def status_thread():
   config_prefix = 'openpilot'
@@ -202,8 +237,9 @@ def status_thread():
       #f.flush()
       sleeptimer = cur_time
 
-      # mqtt message receiver
+      # mqtt message receiver - subscribe to both command topics
       mqttd.subscribe(pm, "openpilot/command")
+      mqttd.subscribe(pm, "openpilot/command/wake")
       sm.update(1)
       if count == 10:
         count = 0
@@ -211,9 +247,19 @@ def status_thread():
       count = count + 1
 
       if sm.updated["mqttRecvQueue"]:
-        print("I got a message")
         message = sm["mqttRecvQueue"]
-        print(f"I RECEVIED A MESSAGE {message.payload}")
+        topic = message.topic if hasattr(message, 'topic') else ''
+        payload = message.payload if hasattr(message, 'payload') else ''
+        print(f"[MQTT] Received message on {topic}: {payload}")
+
+        # Handle wake CAN bus button press
+        if 'wake' in topic or payload == 'PRESS':
+          print("[MQTT] Wake CAN bus button pressed - triggering wake", flush=True)
+          try:
+            result = mqtt.wakeCanBus()
+            print(f"[MQTT] Wake result: {result}", flush=True)
+          except Exception as e:
+            print(f"[MQTT] Wake failed: {e}", flush=True)
 
 
       panda = messaging.recv_sock(panda_state_sock)
