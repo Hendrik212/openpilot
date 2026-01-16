@@ -88,6 +88,20 @@ def publish_sensor_discovery(pm, sensor_name, device_info, config_prefix):
       "value_template": "{{ value_json.charging_status }}",
       "icon": "mdi:ev-station",
     },
+    "charge_limit_ac": {
+      "name": "Charge Limit AC",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.charge_limit_ac }}",
+      "unit_of_measurement": "%",
+      "icon": "mdi:battery-charging-80",
+    },
+    "charge_limit_dc": {
+      "name": "Charge Limit DC",
+      "state_topic": "openpilot/car_status",
+      "value_template": "{{ value_json.charge_limit_dc }}",
+      "unit_of_measurement": "%",
+      "icon": "mdi:battery-charging-high",
+    },
   }
 
   if sensor_name not in sensors:
@@ -171,6 +185,8 @@ def publish_ha_discovery(pm, count, config_prefix):
     "charging_power",
     "charging_time_remaining",
     "charging_status",
+    "charge_limit_ac",
+    "charge_limit_dc",
   ]
 
   binary_sensors = [
@@ -294,6 +310,8 @@ def status_thread():
                  "charging_time_remaining": format_time(mqtt.charging_time_remaining_out),
                  "charging_status": mqtt.charging_status_out,
                  "connector_connected": mqtt.connector_connected_out,
+                 "charge_limit_ac": mqtt.charge_limit_ac_out,
+                 "charge_limit_dc": mqtt.charge_limit_dc_out,
                 }
       mqttd.publish(pm, topic, content)
 
