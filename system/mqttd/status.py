@@ -251,15 +251,23 @@ def status_thread():
         topic = message.topic if hasattr(message, 'topic') else ''
         payload = message.payload if hasattr(message, 'payload') else ''
         print(f"[MQTT] Received message on {topic}: {payload}")
+        with open("/tmp/mqtt_wake.log", "a") as f:
+          f.write(f"{datetime.datetime.now()} - Received: {topic} = {payload}\n")
 
         # Handle wake CAN bus button press
         if 'wake' in topic or payload == 'PRESS':
           print("[MQTT] Wake CAN bus button pressed - triggering wake", flush=True)
+          with open("/tmp/mqtt_wake.log", "a") as f:
+            f.write(f"{datetime.datetime.now()} - WAKE TRIGGERED\n")
           try:
             result = mqtt.wakeCanBus()
             print(f"[MQTT] Wake result: {result}", flush=True)
+            with open("/tmp/mqtt_wake.log", "a") as f:
+              f.write(f"{datetime.datetime.now()} - Wake result: {result}\n")
           except Exception as e:
             print(f"[MQTT] Wake failed: {e}", flush=True)
+            with open("/tmp/mqtt_wake.log", "a") as f:
+              f.write(f"{datetime.datetime.now()} - Wake FAILED: {e}\n")
 
 
       panda = messaging.recv_sock(panda_state_sock)
