@@ -62,11 +62,15 @@ def on_connect(client, userdata, flags, rc):
 
 # Callback function when a message is received
 def on_message(client, userdata, msg):
+    with open("/tmp/mqttd_recv.log", "a") as f:
+        f.write(f"on_message called: {msg.topic} = {msg.payload}\n")
     dat = messaging.new_message("mqttRecvQueue")
     dat.mqttRecvQueue.topic = msg.topic
     dat.mqttRecvQueue.payload = msg.payload
     if userdata is not None:
         userdata.send("mqttRecvQueue", dat)
+        with open("/tmp/mqttd_recv.log", "a") as f:
+            f.write(f"Sent to mqttRecvQueue\n")
     print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
     #f.write(f"{datetime.datetime.now()} Received `{msg.payload.decode()}` from `{msg.topic}` topic\n")
     #f.flush()
