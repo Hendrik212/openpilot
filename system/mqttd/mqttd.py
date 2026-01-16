@@ -65,7 +65,8 @@ def on_message(client, userdata, msg):
     dat = messaging.new_message("mqttRecvQueue")
     dat.mqttRecvQueue.topic = msg.topic
     dat.mqttRecvQueue.payload = msg.payload
-    #pm.send("mqttRecvQueue", dat)
+    if userdata is not None:
+        userdata.send("mqttRecvQueue", dat)
     print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
     #f.write(f"{datetime.datetime.now()} Received `{msg.payload.decode()}` from `{msg.topic}` topic\n")
     #f.flush()
@@ -91,6 +92,7 @@ def on_disconnect(client, userdata, rc):
 # Connect to the MQTT broker
 def connect_mqtt(client, broker, port, username, password, pm):
     client.username_pw_set(username, password)
+    client.user_data_set(pm)  # Pass pm to callbacks via userdata
     client.on_connect = on_connect
     client.on_message = on_message
     client.on_publish = on_publish
