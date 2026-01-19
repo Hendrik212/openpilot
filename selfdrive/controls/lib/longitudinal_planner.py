@@ -167,8 +167,7 @@ class LongitudinalPlanner:
       output_a_target = output_a_target_mpc
       self.output_should_stop = output_should_stop_mpc
     else:
-      # Weighted average: 80% model, 20% MPC for better accel from stop while keeping safety buffer
-      output_a_target = 0.8 * output_a_target_e2e + 0.2 * output_a_target_mpc
+      output_a_target = min(output_a_target_mpc, output_a_target_e2e)
       self.output_should_stop = output_should_stop_e2e or output_should_stop_mpc
 
     for idx in range(2):
