@@ -167,11 +167,12 @@ class LongitudinalPlanner:
       output_a_target = output_a_target_mpc
       self.output_should_stop = output_should_stop_mpc
     else:
-      # Only use weighted average when both are accelerating, otherwise be conservative
-      if output_a_target_e2e > 0 and output_a_target_mpc > 0:
-        output_a_target = 0.6 * output_a_target_e2e + 0.4 * output_a_target_mpc
-      else:
-        output_a_target = min(output_a_target_mpc, output_a_target_e2e)
+      # Smooth blend: adjust model trust based on how positive both accels are
+      # blend_factor: 0.3 (braking) → 0.5 (neutral) → 0.7 (accelerating)
+      min_accel = min(output_a_target_e2e, output_a_target_mpc)
+      t = np.clip(min_accel, -1.0, 1.0)
+      blend_factor = 0.5 + 0.2 * t
+      output_a_target = blend_factor * output_a_target_e2e + (1 - blend_factor) * output_a_target_mpc
       self.output_should_stop = output_should_stop_e2e or output_should_stop_mpc
 
     for idx in range(2):
