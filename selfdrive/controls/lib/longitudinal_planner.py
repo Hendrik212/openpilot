@@ -167,8 +167,8 @@ class LongitudinalPlanner:
       output_a_target = output_a_target_mpc
       self.output_should_stop = output_should_stop_mpc
     else:
-      # Trust model more when it wants to accelerate, stay conservative otherwise
-      if output_a_target_e2e > output_a_target_mpc:
+      # Only use weighted average when both are accelerating, otherwise be conservative
+      if output_a_target_e2e > 0 and output_a_target_mpc > 0:
         output_a_target = 0.6 * output_a_target_e2e + 0.4 * output_a_target_mpc
       else:
         output_a_target = min(output_a_target_mpc, output_a_target_e2e)
